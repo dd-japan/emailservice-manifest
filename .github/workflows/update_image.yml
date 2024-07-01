@@ -1,0 +1,48 @@
+name: Update Yml
+
+on:
+  repository_dispatch:
+    types:
+      - update-yml
+
+jobs:
+  update-yml:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set Env
+        run: |
+          echo GITHUB_REF"=${{ github.event.client_payload.ref }}" >> $GITHUB_ENV
+
+      - name: Update dev Yml
+        if: startsWith(env.GITHUB_REF, 'main')
+        uses: mikefarah/yq@master
+        with:
+          cmd: IMAGE_TAG='601427279990.dkr.ecr.us-east-1.amazonaws.com/emailservice:${{ env.GITHUB_REF }}' yq eval '.containers[].image = env(IMAGE_TAG)' -i emailservice/manifest/emailservice.yaml
+
+      - name: Update stg Yml
+        if: startsWith(env.GITHUB_REF, 'stg-')
+        uses: mikefarah/yq@master
+        with:
+          cmd: IMAGE_TAG='IMAGE_TAG='601427279990.dkr.ecr.us-east-1.amazonaws.com/emailservice:${{ env.GITHUB_REF }}' yq eval '.containers[].image = env(IMAGE_TAG)' -i emailservice/manifest/emailservice.yaml
+
+      - name: Update pilot Yml
+        if: startsWith(env.GITHUB_REF, 'pilot-')
+        uses: mikefarah/yq@master
+        with:
+          cmd: IMAGE_TAG=' IMAGE_TAG=' 601427279990.dkr.ecr.us-east-1.amazonaws.com/emailservice:${{ env.GITHUB_REF }}' yq eval '.containers[].image = env(IMAGE_TAG)' -i emailservice/manifest/emailservice.yaml
+
+      - name: commit & push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="main"
+          git config user.name yutakihara
+          git config user.email k.kyuta.821@gmail.com
+          git checkout -b "$BRANCH_NAME"
+          git add -A
+          git commit -m "$BRANCH_NAME"
+          git push origin "$BRANCH_NAME"
+
