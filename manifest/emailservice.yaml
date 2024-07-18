@@ -51,7 +51,7 @@ spec:
         #       - all
         #   privileged: false
         #   readOnlyRootFilesystem: true
-        image: public.ecr.aws/b1o7r7e0/emailservice:
+        image: public.ecr.aws/b1o7r7e0/emailservice:04cc5cae8c577d9254ebf47f89abce9c9341f47c
         ports:
         - containerPort: 8080
         env:
