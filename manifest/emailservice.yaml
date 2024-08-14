@@ -90,7 +90,7 @@ spec:
             memory: "256Mi"  # メモリ制限を増やす
             cpu: "200m"
           requests:
-            memory: "128Mi"
+            memory: "150Mi" # add comment
             cpu: "100m"
 ---
 apiVersion: v1
